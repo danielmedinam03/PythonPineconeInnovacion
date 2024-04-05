@@ -363,3 +363,36 @@ if archivos_subidos_perfil:
                             st.text_area(f"Contenido Recopilado para {nombre_cv.strip()}:", formateo,
                                          height=300)
 
+                        #SE AGREGAN LOS BOTONES
+
+
+                        # Crear una serie de botones para la retroalimentación del usuario
+                        feedback_options = [
+                            "Muy satisfecho",
+                            "Satisfecho",
+                            "Neutral",
+                            "Insatisfecho",
+                            "Muy insatisfecho"
+                        ]
+
+                        # Mostrar los botones en columnas
+                        cols = st.columns(len(feedback_options))
+                        for i, option in enumerate(feedback_options):
+                            with cols[i]:
+                                cols[i].button(option)
+
+                        # Agregar un icono de 'manita abajo' con componente HTML personalizado
+                        thumbs_down_icon = """
+                            <div style="font-size: 50px; color: grey;">
+                                <i class="fa fa-thumbs-down"></i>
+                            </div>
+                            """
+                        st.markdown(thumbs_down_icon, unsafe_allow_html=True)
+
+                        # Incluir FontAwesome para que los íconos se muestren
+                        st.markdown(
+                            """
+                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+                            """,
+                            unsafe_allow_html=True
+                        )
