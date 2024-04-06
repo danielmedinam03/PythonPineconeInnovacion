@@ -345,7 +345,15 @@ if archivos_subidos_perfil:
                         st.warning("Se Ha cargado todos los CVs correctamente")
                         # Crear una serie de botones para la retroalimentación del usuario
 
+                        print('---inicia response perfil---')
+                        print(st.session_state['bandera_text'])
+                        question = st.session_state['bandera_text']
+                        # format_question=(f"Podrias indicarme los prospectos que se acoplen al siguiente perfil: \n {question} \n")
+                        format_question = "Quien tiene conocimientos de FrontEnd en HTML5,JavaScript"
+                        print(f"\nla pregunta que se hizo es :\n{format_question}")
+                        print('---Fin response perfil---')
 
+                        app_pinecone.retrieve_answer(format_question)
 
                         feedback_options = [
                             "Muy satisfecho",
