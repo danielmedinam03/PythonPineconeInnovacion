@@ -343,6 +343,9 @@ if archivos_subidos_perfil:
                         # SE AGREGAN LOS BOTONES
                         st.warning("Se Ha cargado todos los CVs correctamente")
                         # Crear una serie de botones para la retroalimentación del usuario
+
+
+
                         feedback_options = [
                             "Muy satisfecho",
                             "Satisfecho",
