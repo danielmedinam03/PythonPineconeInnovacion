@@ -197,11 +197,7 @@ def consult_openai(text):
         f"puedes enlistar los perfiles que se requieren por cubrir junto con la tecnologia:  \n  --Inicio Documento -- \n {text} \n  --Fin Documento -- \n")
     prompt = prompt
 
-    print('---inicia prompt---')
-    print(prompt)
-    print('---fin prompt---')
 
-    print("CONSULTA OPENAI -> PUEDES ANALIZAR LOS PERFILES")
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -211,19 +207,7 @@ def consult_openai(text):
         max_tokens=1000,
         temperature=0.7,
     )
-    """
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        prompt=prompt,
-        max_tokens=1000,
-        temperature=0.7,
-        n=1)
 
-    response = openai.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=prompt
-    )
-    """
     return response.choices[0].message.content
 
 
@@ -304,7 +288,8 @@ if archivos_subidos_perfil:
         # Mostrar los contenidos de los perfiles si se ha cargado algo
         response_perfil = ""
         if contenido_perfiles:
-            if st.button('Mostrar los perfiles:'):
+            st.markdown('Da click en procesar para poder extraer las keys del documento de requerimiento')
+            if st.button('Procesar:'):
                 response_perfil = consult_openai(contenido_perfiles)
                 # Generar un nuevo documento, con la informacion enriquecida  y que descargue el documento por le navegador y que complemente los datos de perfiles con tecnolgia
                 text_PERFIL = st.text_area("Contenido de todos los perfiles:",
@@ -344,28 +329,21 @@ if archivos_subidos_perfil:
                             "----- Separador de CV")  # Ajusta según sea necesario
 
                         #--CREACION DEL INDICE--#
-                        print("CREACION DEL INDICE")
                         app_pinecone.create_index()
-                        print("Salimos de la creacion del indice")
                         for seccion in cv_secciones[1:]:  # [1:] para saltar el primer elemento si está vacío
                             nombre_cv, contenido_cv = seccion.split("-----", 1)
                             # Divide en nombre y contenido
                             text_AF = contenido_cv.strip()
                             formateo = consult_openai_personalizada(text_AF, informacion_recopilar)
-                            print("-----Inicio RESPUESTA PROMPT----")
-                            print(formateo)
-                            print("-----FIN RESPUESTA PROMPT----")
+
                             embeddings = embedding_text(formateo)
-                            print("-----vectorizacion  PROMPT----")
 
                             app_pinecone.insert_records(formateo,embeddings)
 
-                            st.text_area(f"Contenido Recopilado para {nombre_cv.strip()}:", formateo,
-                                         height=300)
 
                         #SE AGREGAN LOS BOTONES
 
-
+                        st.warning("Se Ha cargado todos los CVs correctamente")
                         # Crear una serie de botones para la retroalimentación del usuario
                         feedback_options = [
                             "Muy satisfecho",
