@@ -338,6 +338,7 @@ if archivos_subidos_perfil:
                             formateo = consult_openai_personalizada(text_AF, informacion_recopilar)
                             list_text_resume.append(formateo)
 
+
                         app_pinecone.insert_records(list_text_resume)
 
                         # SE AGREGAN LOS BOTONES
