@@ -196,7 +196,6 @@ def consult_openai(text):
         f"puedes enlistar los perfiles que se requieren por cubrir junto con la tecnologia:  \n  --Inicio Documento -- \n {text} \n  --Fin Documento -- \n")
     prompt = prompt
 
-
     response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
@@ -251,6 +250,7 @@ def leer_pdf(archivo):
             texto += pagina.get_text()
     return texto
 
+
 ##Funcion para crear el vector
 def embedding_text(text):
     response = openai.Embedding.create(
@@ -259,6 +259,7 @@ def embedding_text(text):
     )
 
     return response.data[0].embedding
+
 
 # --------------------------------------
 
@@ -327,7 +328,7 @@ if archivos_subidos_perfil:
                         cv_secciones = response_personalizada.split(
                             "----- Separador de CV")  # Ajusta según sea necesario
 
-                        #--CREACION DEL INDICE--#
+                        # --CREACION DEL INDICE--#
                         app_pinecone.create_index()
                         list_text_resume = []
                         for seccion in cv_secciones[1:]:  # [1:] para saltar el primer elemento si está vacío
@@ -336,13 +337,10 @@ if archivos_subidos_perfil:
                             text_AF = contenido_cv.strip()
                             formateo = consult_openai_personalizada(text_AF, informacion_recopilar)
                             list_text_resume.append(formateo)
-                            #embeddings = embedding_text(formateo)
 
-                            #app_pinecone.insert_records(formateo,embeddings)
+                        app_pinecone.insert_records(list_text_resume)
 
-
-                        #SE AGREGAN LOS BOTONES
-
+                        # SE AGREGAN LOS BOTONES
                         st.warning("Se Ha cargado todos los CVs correctamente")
                         # Crear una serie de botones para la retroalimentación del usuario
                         feedback_options = [
