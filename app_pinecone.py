@@ -22,7 +22,7 @@ pc = Pinecone(api_key=pinecone_api_key)
 llm = ChatOpenAI(
     openai_api_key=os.getenv("OPENAI_API_KEY"),
     model_name='gpt-3.5-turbo',
-    temperature=0.0)
+    temperature=0.7)
 
 chain = load_qa_chain(llm, chain_type="stuff")
 
@@ -56,12 +56,13 @@ def insert_records(items, metadata=None):
 
 def results_similarity_search(query, n_results=4):
     result = vectorstore.similarity_search(query, k=n_results)
-    print(result)
     return result
+
 
 
 def retrieve_answer(query, n_results=4):
     doc_result = results_similarity_search(query, n_results=n_results)
     answer = chain.run(input_documents=doc_result, question=query)
-    print(f"Pregunta: {query}")
-    print(f"Repuesta: {answer}")
+    return answer
+
+

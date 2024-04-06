@@ -338,49 +338,62 @@ if archivos_subidos_perfil:
                             formateo = consult_openai_personalizada(text_AF, informacion_recopilar)
                             list_text_resume.append(formateo)
 
-
                         app_pinecone.insert_records(list_text_resume)
 
-                        # SE AGREGAN LOS BOTONES
-                        st.warning("Se Ha cargado todos los CVs correctamente")
-                        # Crear una serie de botones para la retroalimentación del usuario
+                st.session_state['records_inserted'] = True
 
-                        print('---inicia response perfil---')
-                        print(st.session_state['bandera_text'])
-                        question = st.session_state['bandera_text']
-                        # format_question=(f"Podrias indicarme los prospectos que se acoplen al siguiente perfil: \n {question} \n")
-                        format_question = "Quien tiene conocimientos de FrontEnd en HTML5,JavaScript"
-                        print(f"\nla pregunta que se hizo es :\n{format_question}")
-                        print('---Fin response perfil---')
+                if st.session_state.get('records_inserted', False):
+                    # Código que se ejecuta si los registros se insertaron correctamente
+                    st.success("Los registros se han insertado con éxito.")
 
-                        app_pinecone.retrieve_answer(format_question)
 
-                        feedback_options = [
-                            "Muy satisfecho",
-                            "Satisfecho",
-                            "Neutral",
-                            "Insatisfecho",
-                            "Muy insatisfecho"
-                        ]
 
-                        # Mostrar los botones en columnas
-                        cols = st.columns(len(feedback_options))
-                        for i, option in enumerate(feedback_options):
-                            with cols[i]:
-                                cols[i].button(option)
+                  # SE AGREGAN LOS BOTONES
 
-                        # Agregar un icono de 'manita abajo' con componente HTML personalizado
-                        thumbs_down_icon = """
-                            <div style="font-size: 50px; color: grey;">
-                                <i class="fa fa-thumbs-down"></i>
-                            </div>
-                            """
-                        st.markdown(thumbs_down_icon, unsafe_allow_html=True)
+        if st.session_state.get('records_inserted', False):
+            if st.button("Busca los perfiles que mas se asimilen"):
+                print('---inicia response perfil---')
+                print(st.session_state['bandera_text'])
+                format_question_profile = (
+                    f"n Puedes indicarme quienes se asimilan mas al siguiente perfil revisa que tambien cumplan las tecnologias necesarias:\n--Inicio Perfil--\n{st.session_state['bandera_text']}\n --Final Perfil--")
+                print(format_question_profile)
+                print('---Fin response perfil---')
 
-                        # Incluir FontAwesome para que los íconos se muestren
-                        st.markdown(
-                            """
-                            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-                            """,
-                            unsafe_allow_html=True
-                        )
+                resultado_question = app_pinecone.retrieve_answer(format_question_profile,4)
+                print(f"estoy regresando de app_pinecone:\n{resultado_question}")
+                bandera_question=st.text_area("Resultado de busqueda:",
+                                           value=resultado_question, height=400)
+
+
+
+                # SE AGREGAN LOS BOTONES
+                feedback_options = [
+                    "Muy satisfecho",
+                    "Satisfecho",
+                    "Neutral",
+                    "Insatisfecho",
+                    "Muy insatisfecho"
+                ]
+
+                cols = st.columns(len(feedback_options))
+                for i, option in enumerate(feedback_options):
+                    with cols[i]:
+                        if cols[i].button(option):
+                            # Aquí puedes agregar lo que sucedería cuando se presiona cada botón
+                            pass
+
+                # Agregar un icono de 'manita abajo' con componente HTML personalizado
+                thumbs_down_icon = """
+                           <div style="font-size: 50px; color: grey;">
+                               <i class="fa fa-thumbs-down"></i>
+                           </div>
+                           """
+                st.markdown(thumbs_down_icon, unsafe_allow_html=True)
+
+                # Incluir FontAwesome para que los íconos se muestren
+                st.markdown(
+                    """
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+                    """,
+                    unsafe_allow_html=True
+                )
