@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import openai
 import os
 import docx  # Importa el módulo completo en lugar de solo 'Document'
-#from pinecone import Pinecone, ServerlessSpec,PodSpec
 import app_pinecone
 
 informacion_recopilar = '''
@@ -198,7 +197,7 @@ def consult_openai(text):
     prompt = prompt
 
 
-    response = openai.ChatCompletion.create(
+    response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "user",
@@ -217,7 +216,7 @@ def consult_openai_personalizada(text, plantilla):
     promp_PP = 'Del siguiente CV, identifica y  formatea la salida a la plantilla que te voy a compartir,en cuanto no encuentres algún elemento , coloca el sig texto "N/A":'
     promp_p = (
         f"{promp_PP} : \n--Inicio CV-- \n{text} \n--Fin CV-- \n \n--Inicio Plantilla--\n {plantilla} \n --Fin Plantilla--\n")
-    response_personalizada = openai.ChatCompletion.create(
+    response_personalizada = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "user",
@@ -330,15 +329,16 @@ if archivos_subidos_perfil:
 
                         #--CREACION DEL INDICE--#
                         app_pinecone.create_index()
+                        list_text_resume = []
                         for seccion in cv_secciones[1:]:  # [1:] para saltar el primer elemento si está vacío
                             nombre_cv, contenido_cv = seccion.split("-----", 1)
                             # Divide en nombre y contenido
                             text_AF = contenido_cv.strip()
                             formateo = consult_openai_personalizada(text_AF, informacion_recopilar)
+                            list_text_resume.append(formateo)
+                            #embeddings = embedding_text(formateo)
 
-                            embeddings = embedding_text(formateo)
-
-                            app_pinecone.insert_records(formateo,embeddings)
+                            #app_pinecone.insert_records(formateo,embeddings)
 
 
                         #SE AGREGAN LOS BOTONES
