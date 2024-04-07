@@ -5,6 +5,10 @@ import openai
 import os
 import docx  # Importa el módulo completo en lugar de solo 'Document'
 import app_pinecone
+import boto3
+import io
+from PyPDF2 import PdfReader
+import docx2txt as d2t_reader
 
 informacion_recopilar = '''
 Datos Personales
@@ -168,6 +172,13 @@ carpeta = dir_F
 load_dotenv(".env")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+# Example usage for reading from S3
+bucket_name = 'soaint-repository'
+aws_access_key_id = os.getenv("AWS_ACCESS_KEY")
+aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+folder_name = "CV/"
+
 # ----------Funciones de lectura de documentos----
 
 def consult_openai_personalizada(text, plantilla):
@@ -186,10 +197,10 @@ def consult_openai_personalizada(text, plantilla):
 
     return response_personalizada.choices[0].message.content
 
+
 def leer_docx(archivo):
-    doc = docx.Document(archivo)
-    texto_completo = [para.text for para in doc.paragraphs]
-    return '\n'.join(texto_completo)
+    text = d2t_reader.process(io.BytesIO(archivo))
+    return text
 
 
 def leer_pdf_con_fitz(archivo):
@@ -199,14 +210,19 @@ def leer_pdf_con_fitz(archivo):
         texto_completo += pagina.get_text()
     return texto_completo
 
+
 ##Funcion para leer Fichero
 def leer_pdf(archivo):
     texto = ""
-    with fitz.open(archivo) as doc:
-        for pagina in doc:
-            texto += pagina.get_text()
+    doc = PdfReader(io.BytesIO(archivo))
+    for pagina in doc.pages:
+        texto += pagina.extract_text()
     return texto
 
+    # with fitz.open(io.BytesIO(archivo)) as doc:
+    #    for pagina in doc:
+    #        texto += pagina.get_text()
+    # return texto
 
 
 st.title('Módulo de Carga de Archivos')
@@ -223,8 +239,20 @@ if len(os.listdir(carpeta)) <= 0:
         icon="😞"
     )
 
-for idx,archivo in enumerate(os.listdir(carpeta)):
-    st.write(f"Archivo {idx+1}: {archivo}")
+response = s3.list_objects_v2(Bucket=bucket_name, Prefix=folder_name)
+files_s3_raw = response.get("Contents")
+print(files_s3_raw)
+files_s3 = []
+
+for file in files_s3_raw:
+    if file['Key'] != folder_name:
+        files_s3.append(file['Key'])
+
+for idx, file in enumerate(files_s3):
+    st.write(f"Archivo {idx + 1}: {file.split('/', 1)[-1]}")
+
+# for idx,archivo in enumerate(os.listdir(carpeta)):
+# st.write(f"Archivo {idx+1}: {archivo}")
 
 if st.button('Procesar Archivos'):
     with st.spinner("Cargando CVs... Esto puede tomar unos minutos. Por favor espere"):
@@ -232,16 +260,18 @@ if st.button('Procesar Archivos'):
         # Esto podría ser mejor manejado como un diccionario si quieres mantener un mapeo directo
         # entre el nombre del archivo y su contenido.
         nombres_archivos = []
-        for archivo in os.listdir(carpeta):
+        for archivo in files_s3:
             if archivo.endswith('.pdf') or archivo.endswith('.docx'):
                 nombres_archivos.append(archivo)  # Guarda el nombre del archivo para uso posterior
-                ruta_completa = os.path.join(carpeta, archivo)
+                # ruta_completa = os.path.join(carpeta, archivo)
+                obj = s3.get_object(Bucket=bucket_name, Key=archivo)
+                body = obj['Body'].read()
                 # Aquí agregas un separador único o algo que te permita dividir fácilmente luego
                 contenido_total += f"----- Separador de CV: {archivo} -----\n"
                 if archivo.endswith('.pdf'):
-                    contenido_total += leer_pdf(ruta_completa) + "\n"
+                    contenido_total += leer_pdf(body) + "\n"
                 else:  # archivo.endswith('.docx')
-                    contenido_total += leer_docx(ruta_completa) + "\n"
+                    contenido_total += leer_docx(body) + "\n"
         if contenido_total:
             # Suponiendo que consult_openai_personalizada ahora devuelve algo que puedes dividir
             # en secciones individuales por CV.
@@ -262,9 +292,9 @@ if st.button('Procesar Archivos'):
 
             app_pinecone.insert_records(list_text_resume)
 
-        #st.session_state['records_inserted'] = True
+        # st.session_state['records_inserted'] = True
     st.success("Los registros se han insertado con éxito.")
 
-#if st.session_state.get('records_inserted', False):
-        # Código que se ejecuta si los registros se insertaron correctamente
-        #st.success("Los registros se han insertado con éxito.")
+# if st.session_state.get('records_inserted', False):
+# Código que se ejecuta si los registros se insertaron correctamente
+# st.success("Los registros se han insertado con éxito.")
