@@ -266,7 +266,7 @@ def embedding_text(text):
 # --------------------------------------
 
 # Título de la aplicación y descripción
-st.title('Sistema de Gestión de Perfiles')
+st.title('Módulo de Gestión de Perfiles')
 st.markdown(
     'Ingresa a continuacion el Requerimiento de Perfil')
 archivos_subidos_perfil = st.file_uploader("Carga el Documento", type=[
@@ -301,15 +301,26 @@ if archivos_subidos_perfil:
                     carpeta = dir_F
                     st.session_state['records_inserted'] = True
 
+            ##SE AGREGAN LOS BOTONES
 
-                  # SE AGREGAN LOS BOTONES
+        formato_respuesta = """
+        Candidato:
+        -Nombre:
+        -Contacto: 
+
+        -Tecnologías Clave y Habilidades Técnicas que maneja:
+        -Experiencia en el cargo o cargos que se asemejen:
+        -Porcentaje de Afinidad con el Perfil:
+        """
         if st.session_state.get('records_inserted', False):
             if st.button("Busca los perfiles que mas se asimilen"):
                 with st.spinner('Buscando similitudes..Por favor, espere 😊'):
                     print('---inicia response perfil---')
                     print(st.session_state['bandera_text'])
+
                     format_question_profile = (
-                        f"n Puedes indicarme quienes se asimilan mas al siguiente perfil revisa que tambien cumplan las tecnologias necesarias:\n--Inicio Perfil--\n{st.session_state['bandera_text']}\n --Final Perfil--")
+                        f"Puedes indicarme todos los posibles candidatos que mas se asimilan al siguiente perfil revisa que tambien cumplan las tecnologias necesarias, además define que tipo de profesional es Junior, SemiSenior, Senior, también ten en cuenta que el porcentaje de afinidad debe ser numerico, finalmente ordena la respuesta de acuerdo al porcentaje de afinidad de manera ascendente :\n --Inicio formato de respuesta-- \n {formato_respuesta} \n --fin de formato de respuesta-- \n\n--Inicio Perfil--\n{st.session_state['bandera_text']}\n --Final Perfil--, no consideres en la respuesta las palabras 'Inicio formato' y 'Fin de formato' ")
+
                     print(format_question_profile)
                     print('---Fin response perfil---')
 
