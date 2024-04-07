@@ -6,7 +6,7 @@ import os
 import docx  # Importa el módulo completo en lugar de solo 'Document'
 import app_pinecone
 
-
+Mensaje_feedback=""
 
 informacion_recopilar = '''
 Datos Personales
@@ -265,6 +265,7 @@ def embedding_text(text):
 
 # --------------------------------------
 
+
 # Título de la aplicación y descripción
 st.title('Módulo de Gestión de Perfiles')
 st.markdown(
@@ -289,6 +290,10 @@ if archivos_subidos_perfil:
         archivo_perfil.name} -----\n{texto_perfil}\n\n"
         # Mostrar los contenidos de los perfiles si se ha cargado algo
         response_perfil = ""
+
+
+
+
         if contenido_perfiles:
             st.markdown('Da click en procesar para poder extraer las keys del documento de requerimiento')
             if st.button('Procesar'):
@@ -329,34 +334,50 @@ if archivos_subidos_perfil:
                     bandera_question=st.text_area("Resultado de busqueda:",
                                                value=resultado_question, height=400)
 
-                    # SE AGREGAN LOS BOTONES
-                    feedback_options = [
-                        "Muy satisfecho",
-                        "Satisfecho",
-                        "Neutral",
-                        "Insatisfecho",
-                        "Muy insatisfecho"
-                    ]
-
-                    cols = st.columns(len(feedback_options))
-                    for i, option in enumerate(feedback_options):
-                        with cols[i]:
-                            if cols[i].button(option):
-                                # Aquí puedes agregar lo que sucedería cuando se presiona cada botón
-                                pass
-
-                    # Agregar un icono de 'manita abajo' con componente HTML personalizado
-                    thumbs_down_icon = """
-                               <div style="font-size: 50px; color: grey;">
-                                   <i class="fa fa-thumbs-down"></i>
-                               </div>
-                               """
-                    st.markdown(thumbs_down_icon, unsafe_allow_html=True)
-
+                    # SE AGREGAN LOS BOTONES DE FEEDBACK CON ÍCONOS
                     # Incluir FontAwesome para que los íconos se muestren
-                    st.markdown(
-                        """
-                        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-                        """,
-                        unsafe_allow_html=True
-                    )
+                    if bandera_question:
+                        # Inicializar una variable de sesión para guardar el estado del botón (happy, neutral, sad)
+
+                        # Asegurar que button_state exista en st.session_state
+                        if 'button_state' not in st.session_state:
+                            st.session_state.button_state = None
+                        if 'mensaje_feedback' not in st.session_state:
+                            st.session_state.mensaje_feedback = ""
+
+                        # Definición de la función para cambiar el estado y mostrar mensaje
+                        def set_button_state(state):
+                            st.session_state.button_state = state
+
+
+                        def set_button_state(state):
+                            st.session_state.button_state = state
+
+                        # Usar st.columns para crear tres columnas y botones en cada una
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.button("☺️", on_click=set_button_state, args=('happy',))
+                        with col2:
+                            st.button("🙂", on_click=set_button_state, args=('neutral',))
+                        with col3:
+                            st.button("☹️", on_click=set_button_state, args=('sad',))
+
+                        # Pedir feedback
+                        st.markdown("¿Podrías darnos tu feedback para mejorar?")
+
+                        # Espacio para ingresar comentarios
+                        comentarios_ingresados = st.text_area("Escribe tus comentarios aquí:")
+                        # Luego de definir los botones y manejar el estado del botón con set_button_state:
+                        if st.session_state.button_state == 'happy':
+                            st.success("¡Gracias por tu feedback positivo!")
+                            st.session_state.mensaje_feedback = "Feedback positivo recibido."
+                        elif st.session_state.button_state == 'neutral':
+                            st.warning("Gracias por tu feedback. ¡Trabajaremos en mejorar!")
+                            st.session_state.mensaje_feedback = "Feedback neutral recibido."
+                        elif st.session_state.button_state == 'sad':
+                            st.error("Lo sentimos. Tomaremos tu feedback para mejorar.")
+                            st.session_state.mensaje_feedback = "Feedback negativo recibido."
+
+
+
+                        st.write(f"Mensaje de feedback: {st.session_state.mensaje_feedback}")
