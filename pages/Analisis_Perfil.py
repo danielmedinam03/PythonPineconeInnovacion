@@ -319,7 +319,7 @@ if archivos_subidos_perfil:
                     print(st.session_state['bandera_text'])
 
                     format_question_profile = (
-                        f"Puedes indicarme todos los posibles candidatos que mas se asimilan al siguiente perfil revisa que tambien cumplan las tecnologias necesarias, además define que tipo de profesional es Junior, SemiSenior, Senior, también ten en cuenta que el porcentaje de afinidad debe ser numerico, finalmente ordena la respuesta de acuerdo al porcentaje de afinidad de manera ascendente :\n --Inicio formato de respuesta-- \n {formato_respuesta} \n --fin de formato de respuesta-- \n\n--Inicio Perfil--\n{st.session_state['bandera_text']}\n --Final Perfil--, no consideres en la respuesta las palabras 'Inicio formato' y 'Fin de formato' ")
+                        f"Puedes indicarme todos los posibles candidatos que mas se asimilan al siguiente perfil revisa que tambien cumplan las tecnologias necesarias, además define que tipo de profesional es Junior, SemiSenior, Senior, también ten en cuenta que el porcentaje de afinidad debe ser numerico, finalmente ordena la respuesta de acuerdo al porcentaje de afinidad de manera descendente :\n --Inicio formato de respuesta-- \n {formato_respuesta} \n --fin de formato de respuesta-- \n\n--Inicio Perfil--\n{st.session_state['bandera_text']}\n --Final Perfil--, no consideres en la respuesta las palabras 'Inicio formato' y 'Fin de formato' ")
 
                     print(format_question_profile)
                     print('---Fin response perfil---')
