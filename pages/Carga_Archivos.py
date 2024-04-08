@@ -229,7 +229,8 @@ st.title('Módulo de Carga de Archivos')
 st.markdown(
     'Se muestran los archivos listos para procesar:')
 st.info(
-    f"!!IMPORTANTE!!: Para poder analzar los CV, deberas cargar los archivos dentro de la sig ruta:\n{dir_F}",
+    f"!!IMPORTANTE!!: Para poder analzar los CV, deberas cargar los archivos dentro de la siguiente ruta:\n "
+    f"https://soaint-repository.s3.amazonaws.com",
     icon="👾",
 )
 
@@ -280,8 +281,8 @@ if st.button('Procesar Archivos'):
             cv_secciones = response_personalizada.split(
                 "----- Separador de CV")  # Ajusta según sea necesario
 
-            # --CREACION DEL INDICE--#
-            app_pinecone.create_index()
+            # --CREACION DEL INDICE no se va recrear todo--#
+            #app_pinecone.create_index()
             list_text_resume = []
             for seccion in cv_secciones[1:]:  # [1:] para saltar el primer elemento si está vacío
                 nombre_cv, contenido_cv = seccion.split("-----", 1)
