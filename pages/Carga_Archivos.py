@@ -215,8 +215,8 @@ st.title('Módulo de Carga de Archivos')
 st.markdown(
     'Se muestran los archivos listos para procesar:')
 st.info(
-    f"!!IMPORTANTE!!: Para poder analzar los CV, deberas cargar los archivos dentro de la siguiente ruta:\n "
-    f"https://soaint-repository.s3.amazonaws.com",
+    f"!!IMPORTANTE!!: Para poder analizar los CV, deberas cargar los archivos dentro de la siguiente ruta:\n "
+    f"https://soaint-repository.s3.amazonaws.com (Solicitar permiso al administrador)",
     icon="👾",
 )
 
