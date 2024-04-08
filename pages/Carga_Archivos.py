@@ -1,9 +1,7 @@
 import streamlit as st
-import fitz  # PyMuPDF
 from dotenv import load_dotenv
 import openai
 import os
-import docx  # Importa el módulo completo en lugar de solo 'Document'
 import app_pinecone
 import boto3
 import io
@@ -179,6 +177,7 @@ aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 s3 = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
 folder_name = "CV/"
 
+
 # ----------Funciones de lectura de documentos----
 
 def consult_openai_personalizada(text, plantilla):
@@ -203,14 +202,6 @@ def leer_docx(archivo):
     return text
 
 
-def leer_pdf_con_fitz(archivo):
-    doc = fitz.open(stream=archivo.read(), filetype="pdf")
-    texto_completo = ""
-    for pagina in doc:
-        texto_completo += pagina.get_text()
-    return texto_completo
-
-
 ##Funcion para leer Fichero
 def leer_pdf(archivo):
     texto = ""
@@ -218,11 +209,6 @@ def leer_pdf(archivo):
     for pagina in doc.pages:
         texto += pagina.extract_text()
     return texto
-
-    # with fitz.open(io.BytesIO(archivo)) as doc:
-    #    for pagina in doc:
-    #        texto += pagina.get_text()
-    # return texto
 
 
 st.title('Módulo de Carga de Archivos')
@@ -234,12 +220,6 @@ st.info(
     icon="👾",
 )
 
-if len(os.listdir(carpeta)) <= 0:
-    st.error(
-        "Por el momento no contamos con archivos pendientes de procesar. Revise si la carpeta se encuentra vacía",
-        icon="😞"
-    )
-
 response = s3.list_objects_v2(Bucket=bucket_name, Prefix=folder_name)
 files_s3_raw = response.get("Contents")
 print(files_s3_raw)
@@ -249,8 +229,15 @@ for file in files_s3_raw:
     if file['Key'] != folder_name:
         files_s3.append(file['Key'])
 
-for idx, file in enumerate(files_s3):
-    st.write(f"Archivo {idx + 1}: {file.split('/', 1)[-1]}")
+if len(files_s3) <= 0:
+    st.error(
+        "Por el momento no contamos con archivos pendientes de procesar. Revise si la carpeta se encuentra vacía",
+        icon="😞"
+    )
+
+else:
+    for idx, file in enumerate(files_s3):
+        st.write(f"Archivo {idx + 1}: {file.split('/', 1)[-1]}")
 
 # for idx,archivo in enumerate(os.listdir(carpeta)):
 # st.write(f"Archivo {idx+1}: {archivo}")
@@ -282,7 +269,7 @@ if st.button('Procesar Archivos'):
                 "----- Separador de CV")  # Ajusta según sea necesario
 
             # --CREACION DEL INDICE no se va recrear todo--#
-            #app_pinecone.create_index()
+            # app_pinecone.create_index()
             list_text_resume = []
             for seccion in cv_secciones[1:]:  # [1:] para saltar el primer elemento si está vacío
                 nombre_cv, contenido_cv = seccion.split("-----", 1)
