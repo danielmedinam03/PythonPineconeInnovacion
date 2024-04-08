@@ -274,8 +274,7 @@ st.markdown(
 archivos_subidos_perfil = st.file_uploader("Carga el Documento", type=[
     'pdf', 'docx'], accept_multiple_files=True)
 
-if 'bandera_text' not in st.session_state:
-    st.session_state['bandera_text'] = ""
+
 
 if archivos_subidos_perfil:
     for archivo_perfil in archivos_subidos_perfil:
@@ -329,74 +328,72 @@ if archivos_subidos_perfil:
 
                     print(format_question_profile)
                     print('---Fin response perfil---')
+                    st.session_state['questionpinecone']=format_question_profile
 
                     resultado_question = app_pinecone.retrieve_answer(format_question_profile,4)
+                    st.session_state['resultpinecone']=resultado_question
                     print(f"estoy regresando de app_pinecone:\n{resultado_question}")
                     bandera_question=st.text_area("Resultado de busqueda:",
                                                value=resultado_question, height=400)
 
-                    # SE AGREGAN LOS BOTONES DE FEEDBACK CON ÍCONOS
-                    # Incluir FontAwesome para que los íconos se muestren
-                    if bandera_question:
-                        # Inicializar una variable de sesión para guardar el estado del botón (happy, neutral, sad)
 
-                        # Asegurar que button_state exista en st.session_state
-                        if 'button_state' not in st.session_state:
-                            st.session_state.button_state = None
-                        if 'mensaje_feedback' not in st.session_state:
-                            st.session_state.mensaje_feedback = ""
+
+        if 'button_state' not in st.session_state:
+            st.session_state.button_state = None
+        if 'mensaje_feedback' not in st.session_state:
+            st.session_state.mensaje_feedback = ""
 
                         # Definición de la función para cambiar el estado y mostrar mensaje
-                        def set_button_state(state):
-                            st.session_state.button_state = state
+        def set_button_state(state):
+            st.session_state.button_state = state
 
 
-                        def set_button_state(state):
-                            st.session_state.button_state = state
+        def set_button_state(state):
+            st.session_state.button_state = state
 
                         # Usar st.columns para crear tres columnas y botones en cada una
-                        col1, col2, col3 = st.columns(3)
-                        with col1:
-                            st.button("😊", on_click=set_button_state, args=('happy',))
-                        with col2:
-                            st.button("😐", on_click=set_button_state, args=('neutral',))
-                        with col3:
-                            st.button("☹️", on_click=set_button_state, args=('sad',))
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.button("😊", on_click=set_button_state, args=('happy',))
+        with col2:
+            st.button("😐", on_click=set_button_state, args=('neutral',))
+        with col3:
+            st.button("☹️", on_click=set_button_state, args=('sad',))
 
                         # Pedir feedback
-                        st.markdown("¿Podrías dejarnos tu feedback para mejorar?")
+        st.markdown("¿Podrías dejarnos tu feedback para mejorar?")
 
                         # Espacio para ingresar comentarios
-                        comentarios_ingresados = st.text_area("Escribe tus comentarios aquí:")
+        comentarios_ingresados = st.text_area("Escribe tus comentarios aquí:")
                         # Luego de definir los botones y manejar el estado del botón con set_button_state:
-                        if st.session_state.button_state == 'happy':
-                            print("Calificacion buena")
-                            app_db_mongo.save_feedback({"calificacion": 5,
-                                                        "comentarios": comentarios_ingresados,
-                                                        "pregunta": format_question_profile,
-                                                        "respuesta": resultado_question
-                                                        })
-                            st.success("¡Gracias por tu feedback positivo!")
-                            st.session_state.mensaje_feedback = "Feedback positivo recibido."
-                        elif st.session_state.button_state == 'neutral':
-                            print("Calificacion regular")
-                            app_db_mongo.save_feedback({"calificacion": 3,
-                                                        "comentarios": comentarios_ingresados,
-                                                        "pregunta": format_question_profile,
-                                                        "respuesta": resultado_question
-                                                        })
-                            st.warning("Gracias por tu feedback. ¡Trabajaremos en mejorar!")
-                            st.session_state.mensaje_feedback = "Feedback neutral recibido."
-                        elif st.session_state.button_state == 'sad':
-                            print("Calificacion mala")
-                            app_db_mongo.save_feedback({"calificacion": 1,
-                                                        "comentarios": comentarios_ingresados,
-                                                        "pregunta": format_question_profile,
-                                                        "respuesta": resultado_question
-                                                        })
-                            st.error("Lo sentimos. Tomaremos tu feedback para mejorar.")
-                            st.session_state.mensaje_feedback = "Feedback negativo recibido."
+        if st.session_state.button_state == 'happy':
+            print("Calificacion buena")
+            if st.button("Enviar feedback"):
+                app_db_mongo.save_feedback({"calificacion": 5,
+                                        "comentarios": comentarios_ingresados,
+                                        "pregunta": st.session_state['questionpinecone'],
+                                        "respuesta": st.session_state['resultpinecone']
+                                        })
+
+                st.success("¡Gracias por tu feedback positivo!")
+        elif st.session_state.button_state == 'neutral':
+            print("Calificacion regular")
+            if st.button("Enviar feedback"):
+                app_db_mongo.save_feedback({"calificacion": 3,
+                                        "comentarios": comentarios_ingresados,
+                                        "pregunta": st.session_state['questionpinecone'],
+                                        "respuesta": st.session_state['resultpinecone']
+                                        })
+                st.warning("Gracias por tu feedback. ¡Trabajaremos en mejorar!")
+        elif st.session_state.button_state == 'sad':
+            print("Calificacion mala")
+            if st.button("Enviar feedback"):
+                app_db_mongo.save_feedback({"calificacion": 1,
+                                        "comentarios": comentarios_ingresados,
+                                        "pregunta": st.session_state['questionpinecone'],
+                                        "respuesta": st.session_state['resultpinecone']
+                                        })
+                st.error("Lo sentimos. Tomaremos tu feedback para mejorar.")
 
 
 
-                        st.write(f"Mensaje de feedback: {st.session_state.mensaje_feedback}")
