@@ -351,7 +351,12 @@ if archivos_subidos_perfil:
         def set_button_state(state):
             st.session_state.button_state = state
 
-                        # Usar st.columns para crear tres columnas y botones en cada una
+
+        st.markdown("""---""")
+        # Pedir feedback
+        st.markdown("¿Podrías dejarnos tu feedback sobre los resultados obtenidos?")
+
+            # Usar st.columns para crear tres columnas y botones en cada una
         col1, col2, col3 = st.columns(3)
         with col1:
             st.button("😊", on_click=set_button_state, args=('happy',))
@@ -360,8 +365,7 @@ if archivos_subidos_perfil:
         with col3:
             st.button("☹️", on_click=set_button_state, args=('sad',))
 
-                        # Pedir feedback
-        st.markdown("¿Podrías dejarnos tu feedback para mejorar?")
+
 
                         # Espacio para ingresar comentarios
         comentarios_ingresados = st.text_area("Escribe tus comentarios aquí:")

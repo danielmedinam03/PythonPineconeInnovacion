@@ -27,7 +27,9 @@ st.header("Módulos del Sistema")
 st.write("""
 - **Wiki:** En esta sección se explica todo lo referente a la aplicación.
 
-- **Análisis de Perfil:** En esta sección ingrese su documento de requerimiento y luego solicite los candidatos que se ajusten a dichos requerimientos.
+- **Análisis de Perfil:** En esta sección ingrese su documento de requerimiento, procese el archivo para tener un perfil más completo, 
+luego solicite los candidatos que se ajusten a dichos requerimientos.
+Por ultimo dejenos su feedback sobre el resultados obtenidos.
 
 - **Carga de Archivos:** En esta sección podrá cargar hojas de vida nuevas para el procesamiento de perfiles.
 """)
